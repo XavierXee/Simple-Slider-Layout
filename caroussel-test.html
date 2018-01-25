@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    	<meta charset="utf-8">
+    	<title>Simple Slider Layout</title>
+    	<style>
+    		html, body, div, span, applet, object, iframe,
+			h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+			a, abbr, acronym, address, big, cite, code,
+			del, dfn, em, img, ins, kbd, q, s, samp,
+			small, strike, strong, sub, sup, tt, var,
+			b, u, i, center,
+			dl, dt, dd, ol, ul, li,
+			fieldset, form, label, legend,
+			table, caption, tbody, tfoot, thead, tr, th, td,
+			article, aside, canvas, details, embed, 
+			figure, figcaption, footer, header, hgroup, 
+			menu, nav, output, ruby, section, summary,
+			time, mark, audio, video {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+			/* HTML5 display-role reset for older browsers */
+			article, aside, details, figcaption, figure, 
+			footer, header, hgroup, menu, nav, section {
+				display: block;
+			}
+			body {
+				line-height: 1;
+			}
+			ol, ul {
+				list-style: none;
+			}
+			blockquote, q {
+				quotes: none;
+			}
+			blockquote:before, blockquote:after,
+			q:before, q:after {
+				content: '';
+				content: none;
+			}
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+			}
+    		.coverflow {
+    			position: relative;
+    			display: inline-block;
+    			width: 100%;
+    			box-sizing: border-box;
+    			/*padding: 0 30px;*/
+    			border: solid 1px #000;
+    		}
+
+    		.coverflow--wrapper {
+    			box-sizing: border-box;
+    			position: relative;
+    			display: inline-block;
+    		}
+
+    		.coverflow--content {
+    			box-sizing: border-box;
+    			position: relative;
+    			display: inline-block;
+			  	font-size: 0;
+			  	margin-left: 0px;
+			  	transition: margin-left .5s linear;
+    		}
+
+    		.coverflow--item {
+    			box-sizing: border-box;
+    			font-size: 16px;
+    			white-space: none;
+    			position: relative;
+    			display: inline-block;
+    			text-align: center;
+    			line-height: 300px;
+    			border: solid 1px #000;
+    			width: 300px;
+    			height: 300px;
+    			transition: all .5s linear;
+    		}
+
+    		.coverflow--item__active {
+    			background: #C9C9C9;
+    		}
+    	</style>
+  	</head>
+	<body>
+		<div class="coverflow">
+			<div class="coverflow--wrapper">
+				<div class="coverflow--content">
+					<div class="coverflow--item" style="background-color: red;">0</div>
+					<div class="coverflow--item" style="background-color: blue;">1</div>
+					<div class="coverflow--item" style="background-color: orange;">2</div>
+					<div class="coverflow--item" style="background-color: yellow;">3</div>
+					<div class="coverflow--item" style="background-color: green;">4</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			document.addEventListener("DOMContentLoaded", function() { 
+				const wrapper = document.querySelector(".coverflow--wrapper");
+				const content = document.querySelector(".coverflow--content");
+				let items = [...content.children];
+				const itemWidth = Number.parseInt(window.getComputedStyle(items[0]).width);
+				console.log(itemWidth);
+				wrapper.style.width = items.length * itemWidth + 'px';
+				content.style.width = wrapper.style.width;
+
+				const addClass = function (el, className) {
+					if (el.classList) {
+						el.classList.add(className);
+					} else {
+						el.className += ' ' + className;
+					}
+				}
+
+				const removeClass = function (el, className) {
+					if (el.classList) {
+						el.classList.remove(className);
+					} else {
+						el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+					}
+				}
+
+				const move = function (direction) {
+					const contentMarginLeft = !content.style.marginLeft ? 0 : Number.parseInt(content.style.marginLeft);
+					if (direction > 0) {
+						const target = direction > 0 ? items[items.length-1]: items[0];
+						content.removeChild(target);
+						items = [...document.querySelector(".coverflow--content").children];
+						const wrapperMarginLeft = !wrapper.style.marginLeft ? 0 : Number.parseInt(wrapper.style.marginLeft);
+						wrapper.style.marginLeft = wrapperMarginLeft - (itemWidth * direction) + 'px';
+						content.insertBefore(items[items.length-1].cloneNode(true), content.firstChild);
+						content.style.marginLeft = contentMarginLeft + (itemWidth * direction) + 'px';
+				 	} else {
+				 		content.style.marginLeft = contentMarginLeft + (itemWidth * direction) + 'px';
+						content.appendChild(items[0].cloneNode(true));
+						items = [...document.querySelector(".coverflow--content").children];
+						content.style.width = items.length * itemWidth + 'px';
+						setTimeout(() => { 
+							const wrapperMarginLeft = !wrapper.style.marginLeft ? 0 : Number.parseInt(wrapper.style.marginLeft);
+							const target = direction > 0 ? items[items.length-1]: items[0];
+							content.removeChild(target);
+							items = [...document.querySelector(".coverflow--content").children];
+							wrapper.style.marginLeft = wrapperMarginLeft - (itemWidth * direction) + 'px';
+						}, 500);
+				 	}
+				}
+
+				setInterval(() => {
+					move(-1);
+				}, 1000);
+
+			});
+		</script>
+  	</body>
+</html>
